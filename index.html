@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8">
+  <title>溫柔女友聊天機器人</title>
+  <style>
+    body {
+      font-family: "Microsoft JhengHei", sans-serif;
+      background-color: #fff0f5;
+      padding: 20px;
+    }
+    #chatbox {
+      width: 100%;
+      max-width: 600px;
+      margin: 0 auto;
+      border: 2px solid #fcb7af;
+      padding: 15px;
+      background-color: #ffffff;
+      border-radius: 10px;
+      height: 500px;
+      overflow-y: scroll;
+    }
+    .message {
+      margin: 10px 0;
+    }
+    .user {
+      text-align: right;
+      color: #555;
+    }
+    .bot {
+      text-align: left;
+      color: #d63384;
+      font-style: italic;
+    }
+    #inputArea {
+      margin-top: 20px;
+      text-align: center;
+    }
+    input {
+      width: 70%;
+      padding: 10px;
+      font-size: 16px;
+      border: 2px solid #fcb7af;
+      border-radius: 5px;
+    }
+    button {
+      padding: 10px 15px;
+      font-size: 16px;
+      background-color: #fcb7af;
+      border: none;
+      border-radius: 5px;
+      color: white;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #f29ca3;
+    }
+  </style>
+</head>
+<body>
+  <h1 style="text-align:center; color: #d63384;">🌸 溫柔女友聊天室 🌸</h1>
+  <div id="chatbox"></div>
+  <div id="inputArea">
+    <input type="text" id="userInput" placeholder="跟我說說話嘛～">
+    <button onclick="sendMessage()">傳送</button>
+  </div>
+
+  <script>
+    const API_KEY = "AIzaSyA43TBdbqdN8I22hWTHo8KC6jk65efhA5w";
+    const chatbox = document.getElementById('chatbox');
+    
+    async function sendMessage() {
+      const input = document.getElementById('userInput');
+      const userMessage = input.value.trim();
+      if (!userMessage) return;
+
+      // 顯示使用者訊息
+      chatbox.innerHTML += `<div class="message user"><strong>你：</strong>${userMessage}</div>`;
+      chatbox.scrollTop = chatbox.scrollHeight;
+      input.value = '';
+
+      // 準備提示詞
+      const prompt = `你是一位溫柔又體貼的虛擬女朋友，總是用溫柔、關心、可愛的語氣回應男友的訊息。現在男友對你說：「${userMessage}」你會怎麼回答？`;
+
+      // 發送 API 請求
+      const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${API_KEY}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          contents: [{
+            parts: [{ text: prompt }]
+          }]
+        })
+      });
+
+      const data = await res.json();
+      const reply = data?.candidates?.[0]?.content?.parts?.[0]?.text || "嗯嗯～你說得對呢！";
+
+      // 顯示機器人回應
+      chatbox.innerHTML += `<div class="message bot"><strong>女友：</strong>${reply}</div>`;
+      chatbox.scrollTop = chatbox.scrollHeight;
+    }
+  </script>
+</body>
+</html>
